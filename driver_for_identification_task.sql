@@ -27,7 +27,9 @@ BEGIN
 						FROM receivedalarm AS ra
 						WHERE ra.utc_time BETWEEN vFromDate AND vToDate
 					) AS ra
-					INNER JOIN vehicle AS v
+					-- Cambio: INNER JOIN con vehicle_device
+					INNER JOIN vehicle_device AS vd ON ra."idVehicle" = vd.vehicle_id
+					--INNER JOIN vehicle AS v
 					ON ra."idVehicle" = v.id
 					INNER JOIN vehicle_mdvr_go AS vmg
 					ON vmg.vehicle_id = v.id
@@ -52,11 +54,19 @@ BEGIN
 						FROM receivedalarm AS ra
 						WHERE ra.utc_time >= (SELECT NOW() - INTERVAL '12H')
 					) AS ra
-					INNER JOIN vehicle AS v
-					ON ra."idVehicle" = v.id
-					INNER JOIN vehicle_mdvr_go AS vmg
-					ON vmg.vehicle_id = v.id
-					LEFT JOIN driver_alarm_identification_log AS dail
+					-- INNER JOIN vehicle AS v
+					-- ON ra."idVehicle" = v.id
+					-- INNER JOIN vehicle_mdvr_go AS vmg
+					-- ON vmg.vehicle_id = v.id
+					-- LEFT JOIN driver_alarm_identification_log AS dail
+					-- ON dail.received_alarm_id = ra."idAlarm"
+					-- WHERE dail.received_alarm_id IS NULL
+					-- Cambio: INNER JOIN con vehicle_device
+					INNER JOIN vehicle_device AS vd 
+					ON ra."idVehicle" = vd.vehicle_id
+					INNER JOIN vehicle_mdvr_go AS vmg 
+					ON vmg.vehicle_id = vd.vehicle_id
+					LEFT JOIN driver_alarm_identification_log AS dail 
 					ON dail.received_alarm_id = ra."idAlarm"
 					WHERE dail.received_alarm_id IS NULL
 				) AS dt

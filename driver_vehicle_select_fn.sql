@@ -16,11 +16,14 @@ BEGIN
 		FROM
 		(
 			SELECT v.Id AS "id", v.platenumber AS "plate",
-			v.serialMDVR AS "serialMDVR", v.vin, v.name, v.comments,
+			vd.serial AS "serialMDVR", v.vin, v.name, v.comments,  -- Aquí se cambió v.serialMDVR por vd.serial
 			getCamerasByVehicle(v.Id, 2) AS cameras
 			FROM vehicle AS v
 			INNER JOIN farec.driver_vehicle AS dv
 			ON v.Id = dv.vehicle_id
+			-- Cambio: INNER JOIN con vehicle_device
+			INNER JOIN vehicle_device AS vd
+			ON v.Id = vd.vehicle_id
 			WHERE dv.driver_id = vDriverId
 		) AS dt)
 	), '[]'::JSON);

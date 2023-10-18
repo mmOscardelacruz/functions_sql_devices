@@ -24,7 +24,8 @@ BEGIN
                         SELECT ra.Id AS "idAlarm", ra.gpstime AS "dateTime",
                         r.secspreevent AS "secsPreEvent", r.secsposevent AS "secsPosEvent",
                         r.gif_required AS "gifRequired", r.video_required AS "videoRequired",
-                        v.serialMDVR AS "serialMdvr",
+                        --v.serialMDVR AS "serialMdvr",
+                         vd.serial AS "serialMdvr",  -- Cambio: Seleccionando serial de vehicle_device
                         COALESCE(vmg.geotab_go_id, '') as "goId", ra.utc_time AS "utcTime",
                         (SELECT COALESCE(ARRAY_TO_JSON(ARRAY_AGG(dt)), '[]'::JSON)
                         FROM
@@ -46,6 +47,8 @@ BEGIN
                         FROM ONLY receivedalarm AS ra
                         INNER JOIN vehicle AS v
                         ON ra.idvehicle = v.id
+                        INNER JOIN vehicle_device AS vd 
+                        ON v.id = vd.vehicle_id  -- Cambio: Join con vehicle_device
                         LEFT JOIN vehicle_mdvr_go as vmg
                         ON v.id = vmg.vehicle_id
                         INNER JOIN sendrule AS sr

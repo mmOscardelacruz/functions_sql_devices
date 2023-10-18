@@ -79,7 +79,11 @@ BEGIN
 								geotab_historical_classification_alarms_fn(dt."idNotify", vOffsetInt) AS "historicalClassification"
 								FROM
 								(
-									SELECT ga.Id_geotabalarm AS "idNotify", v.Id AS "idVehicle", v.serialMdvr AS "serialMDVR", v.VIN,
+									SELECT ga.Id_geotabalarm AS "idNotify", v.Id AS "idVehicle",
+									--v.serialMdvr AS "serialMDVR",
+									--Change replaced v.serialMdvr with vd.serial
+									vd.serial AS "serialMDVR",
+									v.VIN,
 								 	v.name AS "eco",
 									ga.gpslat AS "latitude", ga.gpslng AS "longitude", ga.gpsTime::TIMESTAMP(0) + vOffsetInt  AS "dateTime", 
 									CASE WHEN (SELECT MIN(date_attended) FROM attendgeotabalarm WHERE id_geotabalarm = ga.id_geotabalarm) IS NULL THEN FALSE ELSE TRUE END AS attended,
@@ -97,6 +101,9 @@ BEGIN
 									ON ga.id_geotabruleserial = gr.id_geotabruleserial
 									INNER JOIN vehicle AS v
 									ON ga.id_vehicle = v.Id
+									--Agregar vehicle_device
+									INNER JOIN vehicle_device AS vd
+									ON vd.vehicle_id = v.Id
 									LEFT JOIN attendgeotabalarm AS aga
 									ON ga.id_geotabalarm = aga.id_geotabalarm
 									LEFT JOIN rule_geotab_category AS rgc
