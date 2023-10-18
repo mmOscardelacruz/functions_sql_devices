@@ -28,8 +28,9 @@ DECLARE
 	vQueries		VARCHAR[];
 	vCount			INT := 1;
 BEGIN
+	--Cambio  en la consulta para obtener los vehiculos
 	IF (JSON_ARRAY_LENGTH(COALESCE(vVehicles, '[]'::JSON)) <= 0) THEN
-		vVehicles := (SELECT ARRAY_TO_JSON(ARRAY_AGG(Id)) FROM vehicle);
+		vVehicles := (SELECT ARRAY_TO_JSON(ARRAY_AGG(vehicle_id)) FROM vehicle_device);
 	END IF;
 	IF (JSON_ARRAY_LENGTH(COALESCE(vRules, '[]'::JSON)) <= 0) THEN
 		vRules := (SELECT ARRAY_TO_JSON(ARRAY_AGG(Id)) FROM rule);
@@ -67,7 +68,7 @@ BEGIN
 								COALESCE((CASE WHEN eet.message IS NULL THEN ee.message ELSE eet.message END), ' || QUOTE_LITERAL('') || ' ) AS "errorMessage"
 								FROM
 								(
-
+										
 									SELECT RA.Id AS "idNotify", V.Id AS "idVehicle", V.SerialMDVR AS "serialMDVR",
 									V.name AS "eco",
 									V.VIN, RA.GPSLat AS "latitude", RA.GPSLng AS "longitude", R.Name AS "ruleName",
@@ -83,9 +84,14 @@ BEGIN
 									FROM receivedalarm AS ra
 									INNER JOIN 
 									(
-										SELECT v.id, v.serialmdvr, v.name, v.vin,
+										--Obtener vehiculos y flotas de los vehiculos que se encuentran en la tabla vehicle_device
+										SELECT vd.vehicle_id AS id, 
+  												 vd.serial AS serialmdvr, 
+   												 v.name, 
+  												 v.VIN,
 										UNNEST(group_parents_branch_fn(v.idfleet)) AS idfleet
-										FROM vehicle AS v
+										FROM vehicle_device AS vd
+										INNER JOIN vehicle AS v ON vd.vehicle_id = v.id
 									) AS v
 									ON ra.idvehicle = v.id
 									INNER JOIN 

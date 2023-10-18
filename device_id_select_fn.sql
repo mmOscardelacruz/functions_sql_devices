@@ -13,9 +13,9 @@ CREATE OR REPLACE FUNCTION public.device_id_select_fn(
 AS $BODY$
 BEGIN
 	RETURN QUERY
-	SELECT Id, serialMDVR 
-	FROM vehicle
-	WHERE serialMDVR IN (SELECT REPLACE(dt::TEXT, '"', '') FROM JSON_ARRAY_ELEMENTS(vData) dt);
+	SELECT vd.vehicle_id AS "idVehicle", vd.serial AS "serialMDVR" 
+	FROM vehicle_device AS vd
+	WHERE vd.serial IN (SELECT REPLACE(dt::TEXT, '"', '') FROM JSON_ARRAY_ELEMENTS(vData) dt);
 END
 $BODY$;
 

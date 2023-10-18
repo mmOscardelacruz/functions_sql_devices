@@ -93,7 +93,10 @@ DECLARE
 												CASE WHEN ee.state = ' || QUOTE_LITERAL(6) || ' AND ee.substate = ' || QUOTE_LITERAL(3) || ' THEN TRUE ELSE FALSE END AS "isOnGeofence"
 												FROM
 												(
-													SELECT ga.Id_geotabalarm AS "idNotify", v.Id AS "idVehicle", v.serialMdvr AS "serialMDVR", v.VIN,
+													SELECT ga.Id_geotabalarm AS "idNotify",
+													v.Id AS "idVehicle",
+													vd.serial AS "serialMDVR",
+													v.VIN,
 													v.name AS "eco", ga.gpslat AS "latitude", ga.gpslng AS "longitude", ga.gpsTime::TIMESTAMP(0) + ' || QUOTE_LITERAL(vOffsetInt)  || ' AS "dateTime",
 													ga.gpsTime::TIMESTAMP(0) AS "utcTime",
 													CASE WHEN (SELECT MIN(date_attended) FROM attendgeotabalarm WHERE id_geotabalarm = ga.id_geotabalarm) IS NULL THEN FALSE ELSE TRUE END AS attended,
@@ -112,6 +115,8 @@ DECLARE
 													ON ga.id_geotabruleserial = gr.id_geotabruleserial
 													INNER JOIN vehicle AS v
 													ON ga.id_vehicle = v.Id
+													INNER JOIN vehicle_device AS vd
+													ON vd.vehicle_id = v.Id
 													LEFT JOIN attendgeotabalarm AS aga
 													ON ga.id_geotabalarm = aga.id_geotabalarm
 													LEFT JOIN rule_geotab_category AS rgc

@@ -26,8 +26,11 @@ BEGIN
 				SELECT tvd.*, 
 				(case when g.gpstime is not null then g.gpstime  else r.gpstime  end) as date_time
 				FROM task_video_data AS tvd
+				-- INNER JOIN vehicle_device AS vdev
+				INNER JOIN vehicle_device AS vdev
+				ON tvd.id_vehicle = vdev.vehicle_id
 				INNER JOIN vehicle AS v
-				ON tvd.id_vehicle = v.id
+				ON vdev.vehicle_id = v.id
 				left join geotabalarm g 
 				on tvd.id_geotabalarm = g.id_geotabalarm 
 				left join receivedalarm r 

@@ -48,9 +48,11 @@ BEGIN
 								FROM receivedalarm_' || TO_CHAR(vCurrentDate, 'YYYY_MM') || ' AS ra
 								INNER JOIN 
 								(
-									SELECT v.id, v.serialmdvr, v.name, v.vin,
+									SELECT v.id, vd.serial AS serialmdvr, v.name, v.vin, -- Cambio aquí: seleccionamos el serial desde vd
 									UNNEST(group_parents_branch_fn(v.idfleet)) AS idfleet
 									FROM vehicle AS v
+									INNER JOIN vehicle_device AS vd 
+									ON v.id = vd.vehicle_id  -- Cambio aquí: JOIN con vehicle_device
 								) AS v
 								ON ra.idvehicle = v.id 
 								INNER JOIN

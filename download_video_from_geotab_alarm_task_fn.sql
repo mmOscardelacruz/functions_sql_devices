@@ -24,7 +24,9 @@ BEGIN
 						SELECT ga.id_geotabalarm AS "idGeotabAlarm", ga.gpstime AS "dateTime",
 						gr.secs_preevent AS "secsPreEvent", gr.secs_posevent AS "secsPosEvent",
 						gr.gif_required AS "gifRequired", gr.video_required AS "videoRequired",
-						v.serialMDVR AS "serialMdvr", ga.gpslat AS latitude, ga.gpslng AS longitude,
+						--v.serialMDVR AS "serialMdvr", ga.gpslat AS latitude, ga.gpslng AS longitude,
+						--Cambios para obtener el serial del mdvr
+						vd.serial AS "serialMdvr", ga.gpslat AS latitude, ga.gpslng AS longitude,
 						gr.zone_restriction_id_entry AS "zoneRestrictionIdEntry",
 						gr.zone_restriction_name_entry AS "zoneRestrictionNameEntry",
 						gr.zone_restriction_id_exit AS "zoneRestrictionIdExit",
@@ -45,6 +47,9 @@ BEGIN
 						ON ga.id_geotabruleserial = gr.id_geotabruleserial
 						INNER JOIN vehicle AS v
 						ON ga.id_vehicle = v.Id
+						--Agregar vehicle_device
+						INNER JOIN vehicle_device AS vd
+            ON vd.vehicle_id = v.Id
 						INNER JOIN JSON_ARRAY_ELEMENTS(vDownloadsLeft) AS downloadsLeft
 						ON v.id = (downloadsLeft->>'vehicleId')::BIGINT
 						WHERE NOT EXISTS (SELECT * FROM geotab_download_task WHERE id_geotabalarm = ga.id_geotabalarm)

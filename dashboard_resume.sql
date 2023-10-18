@@ -47,11 +47,15 @@ BEGIN
 								verificated."isVerificated" AS "verificated",
 								CASE WHEN attend_status.attended_time IS NULL THEN FALSE ELSE TRUE END AS "attended"
 								FROM receivedalarm_' || TO_CHAR(vCurrentDate, 'YYYY_MM') || ' AS ra
+								-- INNER JOIN vehicle_device AS vdev
 								INNER JOIN 
 								(
-									SELECT v.id, v.serialmdvr, v.name, v.vin,
-									UNNEST(group_parents_branch_fn(v.idfleet)) AS idfleet
-									FROM vehicle AS v
+									SELECT vd.vehicle_id AS id, 
+										   vd.serial AS serialmdvr, 
+										   v.name, v.vin,
+										   UNNEST(group_parents_branch_fn(v.idfleet)) AS idfleet
+									FROM vehicle_device AS vd
+									INNER JOIN vehicle AS v ON vd.vehicle_id = v.id
 								) AS v
 								ON ra.idvehicle = v.id 
 								INNER JOIN
@@ -115,8 +119,11 @@ BEGIN
 								FROM geotabalarm_' || TO_CHAR(vCurrentDate, 'YYYY_MM') || ' AS ga
 								INNER JOIN geotabrule AS gr
 								ON ga.id_geotabruleserial = gr.id_geotabruleserial
+								-- INNER JOIN vehicle_device AS vdev
+								INNER JOIN vehicle_device AS vd
+								ON ga.id_vehicle = vd.vehicle_id
 								INNER JOIN vehicle AS v
-								ON v.id = ga.id_vehicle
+								ON vd.vehicle_id = v.id
 								INNER JOIN rule_geotab_category AS rgc
 								ON gr.id_geotabruleserial = rgc.geotab_rule_id
 								INNER JOIN alarm_category AS ac
